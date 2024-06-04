@@ -30,6 +30,11 @@
     let maximized = false;
     let autoScroll = true;
 
+    const numTruncatedDisplay = document.createElement("div");
+    numTruncatedDisplay.classList.add('as-console-num-truncated');
+    numTruncatedDisplay.hidden = true;
+    div.appendChild(numTruncatedDisplay);
+
     wrapper.className = "as-console-wrapper as-console-timestamps";
     div.className = "as-console";
 
@@ -40,7 +45,7 @@
         ".as-console-wrapper { position: fixed; bottom: 0; left: 0; right: 0; max-height: 150px; overflow-y: scroll; overflow-x: hidden; border-top: 1px solid #000; display: none; background: #fff; }",
         ".as-console-wrapper.as-console-maximized { top: 0px; max-height: inherit; display:block; background: #fff; border-top: none;  }",
         ".as-console { border: 1px solid #f0f0f0; display: table; width: 100%; border-collapse: collapse; }",
-        ".as-console-row { display: table-row; font-family: monospace; font-size: 10pt; }",
+        ".as-console-row { display: table-row; font-family: monospace; font-size: 10pt; border: 1px solid #f0f0f0; }",
         ".as-console-timestamps .as-console-row:after { display: table-cell; padding: 3px 6px; color: rgba(0,0,0,.35); border: 1px solid #f0f0f0; content: attr(data-date); vertical-align: top; }",
         ".as-console-row + .as-console-row > * { border: 1px solid #f0f0f0; }",
         ".as-console-row-code { width: 100%; white-space: pre-wrap; padding: 3px 5px; display: table-cell; font-family: monospace; font-size: 13px; vertical-align: middle; }",
@@ -73,7 +78,8 @@
         ".as-console-table th { font-weight: normal; text-align: left; }",
         ".as-console-table th, .as-console-table td { padding: 3px 6px; border-style: solid; border-width: 0 1px; border-color: #aaa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
         ".as-console-table tbody tr:nth-of-type(even) {background-color: #f3f7fd;}",
-        ".as-console-helper-property > .as-console-dictionary-label {font-style: italic;}"
+        ".as-console-helper-property > .as-console-dictionary-label {font-style: italic;}",
+        ".as-console-num-truncated { font-family: monospace; font-size: 10pt; color: rgba(0,0,0,.35); padding: 10px 5px; }",
     ].join("\n");
 
     document.head.appendChild(style);
@@ -420,10 +426,15 @@
         return message;
     }
 
+    let numTruncated = 0;
     function truncateEntries() {
         if (maxEntries < 0) return;
-        while (div.childNodes.length > maxEntries) {
-            div.removeChild(div.firstChild);
+        while (div.childNodes.length > maxEntries + 1) {
+            div.querySelector(':not(.as-console-num-truncated)').remove();
+
+            ++numTruncated;
+            numTruncatedDisplay.hidden = false;
+            numTruncatedDisplay.textContent = `... ${numTruncated} entries truncated ...`;
         }
     }
 
